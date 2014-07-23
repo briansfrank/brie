@@ -34,17 +34,17 @@ const class Commands
 
   const Sys sys
   const Cmd[] list
-  const Cmd exit        := ExitCmd()
-  const Cmd reload      := ReloadCmd()
-  const Cmd save        := SaveCmd()
-  const Cmd esc         := EscCmd()
-  const Cmd recent      := RecentCmd()
-  const Cmd prevMark    := PrevMarkCmd()
-  const Cmd nextMark    := NextMarkCmd()
-  const Cmd find        := FindCmd()
-  const Cmd findInSpace := FindInSpaceCmd()
-  const Cmd goto        := GotoCmd()
-  const Cmd build       := BuildCmd()
+  const Cmd exit         := ExitCmd()
+  const Cmd reload       := ReloadCmd()
+  const Cmd save         := SaveCmd()
+  const Cmd closeConsole := CloseConsoleCmd()
+  const Cmd recent       := RecentCmd()
+  const Cmd prevMark     := PrevMarkCmd()
+  const Cmd nextMark     := NextMarkCmd()
+  const Cmd find         := FindCmd()
+  const Cmd findInSpace  := FindInSpaceCmd()
+  const Cmd goto         := GotoCmd()
+  const Cmd build        := BuildCmd()
 }
 
 **************************************************************************
@@ -83,6 +83,7 @@ internal const class ExitCmd : Cmd
     Env.cur.exit(0)
   }
 }
+
 **************************************************************************
 ** ReloadCmd
 **************************************************************************
@@ -90,7 +91,7 @@ internal const class ExitCmd : Cmd
 internal const class ReloadCmd : Cmd
 {
   override const Str name := "Reload"
-  override const Key? key := Key("Ctrl+R")
+  override const Key? key := Key(Keys.reload)
   override Void invoke(Event event) { frame.reload }
 }
 
@@ -101,18 +102,18 @@ internal const class ReloadCmd : Cmd
 internal const class SaveCmd : Cmd
 {
   override const Str name := "Save"
-  override const Key? key := Key("Ctrl+S")
+  override const Key? key := Key(Keys.save)
   override Void invoke(Event event) { frame.save }
 }
 
 **************************************************************************
-** EscCmd
+** CloseConsoleCmd
 **************************************************************************
 
-internal const class EscCmd : Cmd
+internal const class CloseConsoleCmd : Cmd
 {
   override const Str name := "Esc"
-  override const Key? key := Key("Esc")
+  override const Key? key := Key(Keys.closeConsole)
   override Void invoke(Event event)
   {
     frame.marks = Item[,]
@@ -128,7 +129,7 @@ internal const class EscCmd : Cmd
 internal const class RecentCmd : Cmd
 {
   override const Str name := "Recent"
-  override const Key? key := Key("Ctrl+Space")
+  override const Key? key := Key(Keys.recent)
   override Void invoke(Event event)
   {
     Dialog? dlg
@@ -150,14 +151,14 @@ internal const class RecentCmd : Cmd
 internal const class PrevMarkCmd : Cmd
 {
   override const Str name := "Prev Mark"
-  override const Key? key := Key("Shift+F8")
+  override const Key? key := Key(Keys.prevMark)
   override Void invoke(Event event) { frame.curMark-- }
 }
 
 internal const class NextMarkCmd : Cmd
 {
   override const Str name := "Next Mark"
-  override const Key? key := Key("F8")
+  override const Key? key := Key(Keys.nextMark)
   override Void invoke(Event event) { frame.curMark++ }
 }
 
@@ -168,7 +169,7 @@ internal const class NextMarkCmd : Cmd
 internal const class GotoCmd : Cmd
 {
   override const Str name := "Goto"
-  override const Key? key := Key("Ctrl+G")
+  override const Key? key := Key(Keys.goto)
   override Void invoke(Event event)
   {
     // prompt field
@@ -297,7 +298,7 @@ internal class GotoMatchModel : TableModel
 internal const class FindCmd : Cmd
 {
   override const Str name := "Find"
-  override const Key? key := Key("Ctrl+F")
+  override const Key? key := Key(Keys.find)
   override Void invoke(Event event)
   {
     f := frame.curFile
@@ -399,7 +400,7 @@ internal const class FindCmd : Cmd
 internal const class FindInSpaceCmd : Cmd
 {
   override const Str name := "Find in Space"
-  override const Key? key := Key("Shift+Ctrl+F")
+  override const Key? key := Key(Keys.findInSpace)
   override Void invoke(Event event)
   {
     File? dir
@@ -417,7 +418,7 @@ internal const class FindInSpaceCmd : Cmd
 internal const class BuildCmd : Cmd
 {
   override const Str name := "Build"
-  override const Key? key := Key("F9")
+  override const Key? key := Key(Keys.build)
   override Void invoke(Event event)
   {
     f := findBuildFile

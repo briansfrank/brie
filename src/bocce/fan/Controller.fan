@@ -92,19 +92,19 @@ class Controller
     // navigation
     switch (navKey.toStr)
     {
-      case "Up":         goto(event, caret.up(doc)); return
-      case "Down":       goto(event, caret.down(doc)); return
-      case "Left":       goto(event, caret.left(doc)); return
-      case "Right":      goto(event, caret.right(doc)); return
-      case "Home":       goto(event, caret.home(doc)); return
-      case "End":        goto(event, caret.end(doc)); return
-      case "Ctrl+Left":  goto(event, caret.prevWord(doc)); return
-      case "Ctrl+Right": goto(event, caret.nextWord(doc)); return
-      case "Ctrl+Home":  goto(event, doc.homePos); return
-      case "Ctrl+End":   goto(event, doc.endPos); return
-      case "PageUp":     event.consume; viewport.pageUp; return
-      case "PageDown":   event.consume; viewport.pageDown; return
-      case "Ctrl+C":     event.consume; onCopy; return
+      case Keys.up:         goto(event, caret.up(doc)); return
+      case Keys.down:       goto(event, caret.down(doc)); return
+      case Keys.left:       goto(event, caret.left(doc)); return
+      case Keys.right:      goto(event, caret.right(doc)); return
+      case Keys.prevWord:   goto(event, caret.prevWord(doc)); return
+      case Keys.nextWord:   goto(event, caret.nextWord(doc)); return
+      case Keys.lineStart:  goto(event, caret.home(doc)); return
+      case Keys.lineEnd:    goto(event, caret.end(doc)); return
+      case Keys.docStart:   goto(event, doc.homePos); return
+      case Keys.docEnd:     goto(event, doc.endPos); return
+      case Keys.pageUp:     event.consume; viewport.pageUp; return
+      case Keys.pageDown:   event.consume; viewport.pageDown; return
+      case Keys.copy:       event.consume; onCopy; return
     }
 
     // everything else is editing functionality
@@ -113,17 +113,17 @@ class Controller
     // handle special modify keys
     switch (key.toStr)
     {
-      case "Enter":      event.consume; onEnter; return
-      case "Backspace":  event.consume; onBackspace; return
-      case "Del":        event.consume; onDel(false); return
-      case "Ctrl+Del":   event.consume; onDel(true); return
-      case "Ctrl+D":     event.consume; onCutLine; return
-      case "Ctrl+X":     event.consume; onCut; return
-      case "Ctrl+V":     event.consume; onPaste; return
-      case "Ctrl+Z":     event.consume; changeStack.onUndo(editor); return
-      case "Ctrl+Y":     event.consume; changeStack.onRedo(editor); return
-      case "Tab":        event.consume; onTab(true); return
-      case "Shift+Tab":  event.consume; onTab(false); return
+      case Keys.enter:      event.consume; onEnter; return
+      case Keys.backspace:  event.consume; onBackspace; return
+      case Keys.del:        event.consume; onDel(false); return
+      case Keys.delWord:    event.consume; onDel(true); return
+      case Keys.cutLine:    event.consume; onCutLine; return
+      case Keys.cut:        event.consume; onCut; return
+      case Keys.paste:      event.consume; onPaste; return
+      case Keys.undo:       event.consume; changeStack.onUndo(editor); return
+      case Keys.redo:       event.consume; changeStack.onRedo(editor); return
+      case Keys.indent:     event.consume; onTab(true); return
+      case Keys.unindent:   event.consume; onTab(false); return
     }
 
     // normal insert of character
