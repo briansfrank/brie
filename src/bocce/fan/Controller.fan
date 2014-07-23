@@ -113,17 +113,20 @@ class Controller
     // handle special modify keys
     switch (key.toStr)
     {
-      case Keys.enter:      event.consume; onEnter; return
-      case Keys.backspace:  event.consume; onBackspace; return
-      case Keys.del:        event.consume; onDel(false); return
-      case Keys.delWord:    event.consume; onDel(true); return
-      case Keys.cutLine:    event.consume; onCutLine; return
-      case Keys.cut:        event.consume; onCut; return
-      case Keys.paste:      event.consume; onPaste; return
-      case Keys.undo:       event.consume; changeStack.onUndo(editor); return
-      case Keys.redo:       event.consume; changeStack.onRedo(editor); return
-      case Keys.indent:     event.consume; onTab(true); return
-      case Keys.unindent:   event.consume; onTab(false); return
+      case Keys.enter:         event.consume; onEnter; return
+      case Keys.backspace:     event.consume; onBackspace("char"); return
+      case Keys.backspaceWord: event.consume; onBackspace("word"); return
+      case Keys.backspaceLine: event.consume; onBackspace("line"); return
+      case Keys.del:           event.consume; onDel("char"); return
+      case Keys.delWord:       event.consume; onDel("word"); return
+      case Keys.delLine:       event.consume; onDel("line"); return
+      case Keys.cutLine:       event.consume; onCutLine; return
+      case Keys.cut:           event.consume; onCut; return
+      case Keys.paste:         event.consume; onPaste; return
+      case Keys.undo:          event.consume; changeStack.onUndo(editor); return
+      case Keys.redo:          event.consume; changeStack.onRedo(editor); return
+      case Keys.indent:        event.consume; onTab(true); return
+      case Keys.unindent:      event.consume; onTab(false); return
     }
 
     // normal insert of character
@@ -221,22 +224,34 @@ class Controller
     viewport.goto(Pos(caret.line+1, col))
   }
 
-  private Void onBackspace()
+  private Void onBackspace(Str mode)
   {
     if (editor.selection != null) { delSelection; return }
     doc := editor.doc
     caret := editor.caret
-    prev := caret.left(doc)
+    Pos? prev
+    switch (mode)
+    {
+      case "char": prev = caret.left(doc)
+      case "word": prev = caret.prevWord(doc)
+      case "line": prev = caret.home(doc)
+    }
     modify(Span(prev, caret), "")
     viewport.goto(prev)
   }
 
-  private Void onDel(Bool word)
+  private Void onDel(Str mode)
   {
     if (editor.selection != null) { delSelection; return }
     doc := editor.doc
     caret := editor.caret
-    next := word ? caret.endWord(doc) : caret.right(doc)
+    Pos? next
+    switch (mode)
+    {
+      case "char": next = caret.right(doc)
+      case "word": next = caret.endWord(doc)
+      case "line": next = caret.end(doc)
+    }
     modify(Span(caret, next), "")
   }
 
