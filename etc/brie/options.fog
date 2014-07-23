@@ -5,13 +5,12 @@ Options
   ** Absolute paths for directories to index
   indexDirs =
   [
-    `/fan/`,
-    `/sidewalk/`,
-    `/skyspark/`,
-    `/dev/`,
-    `/stuff/play`,
+    `/work/fan/`,
+    `/work/sidewalk/`,
+    `/work/skyspark/`,
+    `/work/brie/`,
   ]
-  
+
   ** Home to use for fan commands/build
-  fanHomeUri = `/fan/`
+  fanHomeUri = `/work/fan/`
 }
