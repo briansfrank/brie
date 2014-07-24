@@ -68,17 +68,15 @@ const class FileSpace : Space
   override Widget onLoad(Frame frame)
   {
     // build path bar
-    pathBar := GridPane
-    {
-      numCols = path.path.size + 1
-    }
+    items := Item[Item(dir) { it.dis = FileUtil.pathDis(dir) }]
     x := this.dir
-    pathBar.add(makePathButton(frame, x))
     path.path.each |name|
     {
-      x = File(x.uri.plusName(name), false)
-      pathBar.add(makePathButton(frame, x))
+       x = File(x.uri.plusName(name), false)
+       items.add(Item(x))
     }
+    pathBar := NavBar(frame)
+    pathBar.load(items, -1)
 
     // build dir listing
     lastDir := x.isDir ? x : x.parent
@@ -91,19 +89,8 @@ const class FileSpace : Space
     return EdgePane
     {
       top = InsetPane(0, 4, 6, 2) { pathBar, }
-      left = lister
-      center = view
-    }
-  }
-
-  private Button makePathButton(Frame frame, File file)
-  {
-    dis := file === this.dir ? FileUtil.pathDis(file) : file.name
-    return Button
-    {
-      text  = dis
-      image = Theme.fileToIcon(file)
-      onAction.add |e| { frame.goto(Item(file)) }
+      left = InsetPane(0, 4, 0, 0) { lister, }
+      center = InsetPane(0, 4, 0, 0) { view, }
     }
   }
 

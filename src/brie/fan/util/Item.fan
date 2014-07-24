@@ -17,6 +17,14 @@ using bocce
 **
 const class Item
 {
+  new makeSpace(Space space)
+  {
+    this.dis = space.dis
+    this.icon = space.icon
+    this.space = space
+    this.isSpace = true
+  }
+
   static Item[] makeFiles(File[] files)
   {
     acc := Item[,]
@@ -85,6 +93,8 @@ const class Item
 
   const Space? space
 
+  const Bool isSpace
+
   const File? file
 
   const Int line
@@ -109,7 +119,22 @@ const class Item
 
   Menu? popup(Frame frame)
   {
-    if (file == null) return null
+    if (isSpace) return popupSpace(frame)
+    if (file != null) return popupFile(frame)
+    return null
+  }
+
+  private Menu? popupSpace(Frame frame)
+  {
+    if (space is HomeSpace) return null
+    return Menu
+    {
+      MenuItem { text="Close"; onAction.add { frame.closeSpace(space) } },
+    }
+  }
+
+  private Menu? popupFile(Frame frame)
+  {
     FindCmd findCmd := frame.sys.commands.find
     return Menu
     {

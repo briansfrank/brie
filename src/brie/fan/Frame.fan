@@ -102,6 +102,9 @@ class Frame : Window
   ** Route to best open space or open new one for given item.
   Void goto(Item item)
   {
+    // select space
+    if (item.isSpace) { select(item.space); return }
+
     // if this item is one of our marks, let console know
     markIndex := marks.indexSame(item)
     if (markIndex != null)
