@@ -116,8 +116,8 @@ class TextView : View
     if (editor.ro) return
     switch (event.key.toStr)
     {
-      case "Ctrl+=": event.consume; insertSection
-      case "Ctrl+Slash": event.consume; toggleCommentBlock
+      case Keys.insertSection: event.consume; insertSection
+      case Keys.toggleComment: event.consume; toggleCommentBlock
     }
   }
 
