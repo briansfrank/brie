@@ -45,7 +45,7 @@ class Keys
   const static Str copy          := mac ? "Command+C" : "Ctrl+C"
   const static Str cut           := mac ? "Command+X" : "Ctrl+X"
   const static Str paste         := mac ? "Command+V" : "Ctrl+V"
-  const static Str cutLine       := mac ? "Command+D" : "Ctrl+D"
+  const static Str cutLine       := mac ? "Command+Y" : "Ctrl+Y"
   const static Str undo          := mac ? "Command+Z" : "Ctrl+Z"
   const static Str redo          := mac ? "Shift+Command+Z" : "Shift+Ctrl+Z"
 
