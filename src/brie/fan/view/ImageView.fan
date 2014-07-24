@@ -12,7 +12,7 @@ using syntax
 using bocce
 
 **
-** TextView
+** ImageView
 **
 class ImageView : View
 {
