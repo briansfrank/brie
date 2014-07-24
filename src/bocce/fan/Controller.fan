@@ -120,6 +120,7 @@ class Controller
       case Keys.del:           event.consume; onDel("char"); return
       case Keys.delWord:       event.consume; onDel("word"); return
       case Keys.delLine:       event.consume; onDel("line"); return
+      case Keys.dupLine:       event.consume; onDupLine; return
       case Keys.cutLine:       event.consume; onCutLine; return
       case Keys.cut:           event.consume; onCut; return
       case Keys.paste:         event.consume; onPaste; return
@@ -255,6 +256,19 @@ class Controller
     modify(Span(caret, next), "")
   }
 
+  private Void onDupLine()
+  {
+    if (editor.selection != null) { delSelection; return }
+    doc := editor.doc
+    caret := editor.caret
+    start := Pos(caret.line, 0)
+    end := caret.line >= doc.lineCount-1 ? doc.endPos : Pos(caret.line+1, 0)
+    span := Span(start, end)
+    text := doc.textRange(span)
+    modify(end.toSpan, text)
+    viewport.goto(Pos(end.line, caret.col))
+  }
+
   private Void onCutLine()
   {
     if (editor.selection != null) { delSelection; return }
@@ -267,6 +281,7 @@ class Controller
     Desktop.clipboard.setText(text)
     modify(span, "")
   }
+
   private Void delSelection()
   {
     sel := editor.selection
@@ -347,6 +362,7 @@ class Controller
     change.execute(editor)
     changeStack.push(change)
   }
+
 //////////////////////////////////////////////////////////////////////////
 // Mouse Eventing
 //////////////////////////////////////////////////////////////////////////
