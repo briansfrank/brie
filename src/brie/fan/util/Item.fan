@@ -135,13 +135,25 @@ const class Item
 
   private Menu? popupFile(Frame frame)
   {
-    FindCmd findCmd := frame.sys.commands.find
+    cmds := frame.sys.commands
     return Menu
     {
       MenuItem
       {
         it.text = "Find in \"$dis\""
-        it.onAction.add |e| { findCmd.find(file) }
+        it.onAction.add |e| { cmds.find.runOn(file) }
+      },
+      MenuItem { it.mode = MenuItemMode.sep },
+      MenuItem
+      {
+        it.text = "Duplicate"
+        it.onAction.add |e| { cmds.fileDup.runOn(file) }
+        it.enabled = !file.isDir
+      },
+      MenuItem
+      {
+        it.text = "Delete"
+        it.onAction.add |e| { cmds.fileDelete.runOn(file) }
       },
     }
   }

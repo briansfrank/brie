@@ -17,6 +17,7 @@ abstract class View : ContentPane
 {
   static View? makeBest(Frame frame, File file)
   {
+    if (file.isDir) return DirView(frame, file)
     mime := file.mimeType ?: MimeType("text/plain")
     if (mime.mediaType == "text") return TextView(frame, file)
     if (mime.mediaType == "image") return ImageView(frame, file)

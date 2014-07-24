@@ -89,7 +89,7 @@ const class FileSpace : Space
     return EdgePane
     {
       top = InsetPane(0, 4, 6, 2) { pathBar, }
-      left = InsetPane(0, 4, 0, 0) { lister, }
+      left = InsetPane(0, 4, 0, 4) { lister, }
       center = InsetPane(0, 4, 0, 0) { view, }
     }
   }

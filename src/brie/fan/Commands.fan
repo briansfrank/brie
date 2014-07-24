@@ -44,6 +44,8 @@ const class Commands
   const Cmd find         := FindCmd()
   const Cmd findInSpace  := FindInSpaceCmd()
   const Cmd goto         := GotoCmd()
+  const Cmd fileDup      := FileDupCmd()
+  const Cmd fileDelete   := FileDeleteCmd()
   const Cmd build        := BuildCmd()
 }
 
@@ -56,6 +58,8 @@ const abstract class Cmd
   abstract Str name()
 
   abstract Void invoke(Event event)
+
+  virtual Void runOn(File f) { throw UnsupportedErr() }
 
   virtual Key? key() { null }
 
@@ -302,10 +306,10 @@ internal const class FindCmd : Cmd
   override Void invoke(Event event)
   {
     f := frame.curFile
-    if (f != null) find(f)
+    if (f != null) runOn(f)
   }
 
-  Void find(File file)
+  override Void runOn(File file)
   {
     prompt := Text { }
     path := Text { text = FileUtil.pathDis(file) }
@@ -407,7 +411,50 @@ internal const class FindInSpaceCmd : Cmd
     cs := frame.curSpace
     if (cs is PodSpace)  dir = ((PodSpace)cs).dir
     if (cs is FileSpace) dir = ((FileSpace)cs).dir
-    if (dir != null) ((FindCmd)sys.commands.find).find(dir)
+    if (dir != null) ((FindCmd)sys.commands.find).runOn(dir)
+  }
+}
+
+**************************************************************************
+** FileDupCmd
+**************************************************************************
+
+internal const class FileDupCmd : Cmd
+{
+  override const Str name := "File Dup"
+  override Void invoke(Event event) { throw Err("Need file") }
+
+  override Void runOn(File f)
+  {
+    if (f.isDir)
+    {
+      Dialog.openErr(frame, "File is directory")
+      return
+    }
+
+    prompt := Dialog.openPromptStr(frame, "File name:", f.name)
+    if (prompt == null) return
+
+    f.copyTo(f.parent.plus(prompt.toUri))
+    frame.reload
+  }
+}
+
+**************************************************************************
+** FileDeleteCmd
+**************************************************************************
+
+internal const class FileDeleteCmd : Cmd
+{
+  override const Str name := "File Delete"
+  override Void invoke(Event event) { throw Err("Need file") }
+
+  override Void runOn(File f)
+  {
+    r := Dialog.openQuestion(frame, "Delete $f.name?", null, Dialog.okCancel)
+    if (r != Dialog.ok) return
+    f.delete
+    frame.reload
   }
 }
 
