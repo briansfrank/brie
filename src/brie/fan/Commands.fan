@@ -137,12 +137,15 @@ internal const class RecentCmd : Cmd
   override Void invoke(Event event)
   {
     Dialog? dlg
-    picker := HistoryPicker(frame.history.items) |item, e|
+    picker := ItemList(frame, frame.history.items)
+    picker.showAcc = true
+    picker.showSpace = true
+    picker.onAction.add |e|
     {
-      frame.goto(item)
+      frame.goto(e.data)
       dlg.close
     }
-    pane := ConstraintPane { minw = 300; maxh = 300; add(picker) }
+    pane := ConstraintPane { minw = 400; minh = 400; add(picker) }
     dlg = Dialog(frame) { title="Recent"; body=pane; commands=[Dialog.ok, Dialog.cancel]; defCommand=null }
     dlg.open
   }
@@ -176,74 +179,28 @@ internal const class GotoCmd : Cmd
   override const Key? key := Key(Keys.goto)
   override Void invoke(Event event)
   {
-    // prompt field
-    font :=  Desktop.sysFontMonospace
-    prompt := Text
-    {
-      it.font = font
-    }
-
-    // table of matches
-    matches := GotoMatchModel { itemFont = font; width = 500 }
-    table := Table
-    {
-      it.headerVisible = false
-      it.model = matches
-    }
-
-    // check for current selection to initialize
-    selection := frame.curView?.curSelection ?: ""
-    prompt.text = selection
+    // build finder
+    finder := ItemFinder(frame)
 
     // build dialog
-    Item? selected
     ok := Dialog.ok
     cancel := Dialog.cancel
     dialog := Dialog(frame)
     {
       title = "Goto"
+      body = finder
       commands = [ok, cancel]
-      body = EdgePane
-      {
-        top = InsetPane(0, 0, 10, 0) { prompt, }
-        bottom = ConstraintPane
-        {
-          minw = maxw = matches.width+10
-          minh = maxh = 500
-          table,
-        }
-      }
+      defCommand = null
     }
-    prompt.onAction.add |e| { dialog.close(ok) }
-    prompt.onKeyDown.add |e|
-    {
-      if (e.key == Key.down)
-      {
-        e.consume
-        if (table.model.numRows > 0) table.selected = [0]
-        table.focus
-      }
-    }
-    prompt.onModify.add |e|
-    {
-      matches.items = findMatches(prompt.text.trim)
-      table.refreshAll
-    }
-    table
-    {
-      onAction.add |e|
-      {
-        selected = matches.items.getSafe(table.selected.first ?: -1)
-        dialog.close(ok)
-      }
-    }
+
+    // finder event handling
+    Item? selected := null
+    finder.onAction.add |e| { selected = e.data; dialog.close(ok) }
 
     // open dialog
     if (dialog.open != Dialog.ok) return
 
-    // if we got actual selection from table use that
-    // otherwise assume top match from table
-    if (selected == null) selected = matches.items.first
+    // process selection
     if (selected == null) return
     frame.goto(selected)
   }
@@ -278,21 +235,6 @@ internal const class GotoCmd : Cmd
 
     return acc
   }
-}
-
-internal class GotoMatchModel : TableModel
-{
-  Font? itemFont
-  Int width
-  Item[] items := Item[,]
-
-  override Int numRows() { items.size }
-  override Int numCols() { 1 }
-  override Str header(Int col) { "" }
-  override Str text(Int col, Int row) { items[row].dis }
-  override Image? image(Int col, Int row) { items[row].icon }
-  override Font? font(Int col, Int row) { itemFont }
-  override Int? prefWidth(Int col) { width }
 }
 
 **************************************************************************
