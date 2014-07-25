@@ -27,8 +27,8 @@ class Keys
   const static Str nextWord      := mac ? "Alt+Right"     : "Ctrl+Right"
   const static Str lineStart     := mac ? "Command+Left"  : "Home"
   const static Str lineEnd       := mac ? "Command+Right" : "End"
-  const static Str docStart      := mac ? "Home"          : "Ctrl+Home"
-  const static Str docEnd        := mac ? "End"           : "Ctrl+End"
+  const static Str docStart      := mac ? "Command+Up"    : "Ctrl+Home"
+  const static Str docEnd        := mac ? "Command+Down"  : "Ctrl+End"
   const static Str pageUp        := "PageUp"
   const static Str pageDown      := "PageDown"
 
@@ -59,6 +59,7 @@ class Keys
   const static Str prevMark      := mac ? "Command+[" : "Shift+F8"
   const static Str nextMark      := mac ? "Command+]" : "F8"
   const static Str goto          := mac ? "Command+G" : "Ctrl+G"
+  const static Str showDocs      := mac ? "Command+P" : "Ctrl+P"
   const static Str closeConsole  := "Esc"
   const static Str recent        := "Ctrl+Space"
   const static Str build         := mac ? "Command+B" : "F9"
