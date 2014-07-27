@@ -44,33 +44,80 @@ internal class ItemFinder : EdgePane
 
     prompt.onModify.add |e|
     {
-      list.update(findMatches(prompt.text.trim))
+      updateMatches
     }
 
     list.onAction.add |e|
     {
       fireAction(e.data)
     }
+
+    list.onSelect.add |e|
+    {
+      onSelect.fire(Event { it.id = EventId.select; it.widget = this; it.data = e.data })
+    }
+
+    list.onKeyDown.add |e|
+    {
+      if (e.key == Key.space)
+      {
+        prompt.focus
+        e.consume
+      }
+    }
   }
 
   once EventListeners onAction() { EventListeners() }
 
-  Bool matchLineNums := true
+  once EventListeners onSelect() { EventListeners() }
 
-  Bool matchFiles := true
+  Bool slotMode
 
   private Void fireAction(Item? item)
   {
     if (item == null) return
+
+    if (slotMode && item.type != null && item.slot == null)
+    {
+      prompt.text =  item.type.qname + "."
+      updateMatches
+      prompt.focus
+      prompt.select(prompt.text.size, 0)
+    }
+
     onAction.fire(Event { it.id = EventId.action; it.widget = this; it.data = item })
+  }
+
+  private Void updateMatches()
+  {
+    list.update(findMatches(prompt.text.trim))
   }
 
   private Item[] findMatches(Str text)
   {
     acc := Item[,]
 
+    // qualified slot name
+    if (text.contains("::") && text.contains("."))
+    {
+      pod := sys.index.pod(text[0..<text.index("::")])
+      if (pod != null)
+      {
+        type := pod.type(text[text.index("::")+2..<text.index(".")])
+        if (type != null)
+        {
+          prefix := text[text.index(".")+1..-1]
+          type.slots.each |s|
+          {
+            if (s.name.startsWith(prefix)) acc.add(Item(s) { dis = s.name })
+          }
+          return acc
+        }
+      }
+    }
+
     // integers are always line numbers
-    if (matchLineNums)
+    if (!slotMode)
     {
       line := text.toInt(10, false)
       file := frame.curFile
@@ -78,7 +125,7 @@ internal class ItemFinder : EdgePane
         return [Item { it.dis= "Line $line"; it.file = file; it.line = line-1 }]
     }
 
-    /// slots in current type
+    // slots in current type
     curType := frame.curSpace.curType
     if (curType != null)
     {
@@ -93,7 +140,7 @@ internal class ItemFinder : EdgePane
       acc.addAll(sys.index.matchTypes(text).map |t->Item| { Item(t) })
 
     // f <file>
-    if (matchFiles)
+    if (!slotMode)
     {
       if (text.startsWith("f ") && text.size >= 3)
         acc.addAll(sys.index.matchFiles(text[2..-1]))

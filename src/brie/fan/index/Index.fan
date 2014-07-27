@@ -87,6 +87,28 @@ const class Index
     cache.send(Msg("podForFile", file)).get(timeout)
   }
 
+  ** Get the pod documentation
+  DocPod? podDoc(PodInfo p)
+  {
+    cache.send(Msg("podDoc", p)).get(timeout)
+  }
+
+  ** Type documentation
+  DocType? typeDoc(TypeInfo t)
+  {
+    podDoc := podDoc(t.pod)
+    if (podDoc == null) return null
+    return podDoc.type(t.name, false)
+  }
+
+  ** Slot documentation
+  DocSlot? slotDoc(SlotInfo s)
+  {
+    typeDoc := typeDoc(s.type)
+    if (typeDoc == null) return null
+    return typeDoc.slot(s.name, false)
+  }
+
   ** Rebuild the entire index asynchronously
   Void reindexAll()
   {
@@ -130,6 +152,7 @@ const class Index
     if (id === "matchFiles")  return Unsafe(c.matchFiles(msg.a, msg.b))
     if (id === "addPodSrc")   return c.addPodSrc(msg.a, msg.b, msg.c)
     if (id === "addPodLib")   return c.addPodLib(msg.a, msg.b, msg.c)
+    if (id === "podDoc")      return c.podDoc(msg.a)
     if (id === "clearAll")    return Actor.locals["cache"] = IndexCache(this)
 
     echo("ERROR: Unknown msg: $msg.id")

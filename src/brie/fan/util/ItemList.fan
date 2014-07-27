@@ -28,6 +28,7 @@ class ItemList : Panel
     onMouseUp.add |e| { doMouseUp(e) }
     onKeyDown.add |e| { doKeyDown(e) }
     onFocus.add |e| { doFocus(e) }
+    onBlur.add |e| { doBlur(e) }
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -96,6 +97,7 @@ class ItemList : Panel
     this.spaceW = auxFont.width("m") * maxSpace
 
     &highlight = null
+    select(null)
     relayout
     repaint
   }
@@ -170,10 +172,12 @@ class ItemList : Panel
   }
 
 //////////////////////////////////////////////////////////////////////////
-// Eventing
+// Event Listeners
 //////////////////////////////////////////////////////////////////////////
 
   once EventListeners onAction() { EventListeners() }
+
+  once EventListeners onSelect() { EventListeners() }
 
   private Void fireAction(Item? item)
   {
@@ -183,6 +187,16 @@ class ItemList : Panel
     else
       onAction.fire(Event { it.id = EventId.action; it.widget = this; it.data = item })
   }
+
+  private Void fireSelect()
+  {
+    item := selected == null ? null : items.getSafe(selected)
+    onSelect.fire(Event { it.id = EventId.select; it.widget = this; it.data = item })
+  }
+
+//////////////////////////////////////////////////////////////////////////
+// Event Handling
+//////////////////////////////////////////////////////////////////////////
 
   private Item? yToItem(Int y) { items.getSafe(yToLine(y)) }
 
@@ -213,7 +227,7 @@ class ItemList : Panel
       if (dlg != null)
       {
         cancel := dlg.commands.find |cmd| { cmd == Dialog.cancel }
-        if (cancel != null) dlg.close(cancel)
+        if (cancel != null || dlg.commands.size == 1) dlg.close(cancel)
       }
       return
     }
@@ -222,17 +236,19 @@ class ItemList : Panel
 
     if (event.key == Key.up && lineCount > 0)
     {
-      selected--
-      if (selected < 0) selected = 0
-      repaint
+      if (selected == null)
+        select(0)
+      else
+        select(selected-1)
       return
     }
 
     if (event.key == Key.down && lineCount > 0)
     {
-      selected++
-      if (selected >= lineCount) selected = lineCount-1
-      repaint
+      if (selected == null)
+        select(0)
+      else
+        select(selected+1)
       return
     }
 
@@ -255,11 +271,46 @@ class ItemList : Panel
   private Void doFocus(Event e)
   {
     if (showAcc && selected < 0 && !items.isEmpty)
-    {
-      selected = 0
-      repaint
-    }
+      select(0)
   }
+
+  private Void doBlur(Event e)
+  {
+    select(null)
+  }
+
+  private Void select(Int? selected)
+  {
+    // slip to range
+    if (selected != null)
+    {
+      if (selected >= items.size) selected = items.size - 1
+      if (selected < 0) selected = 0
+    }
+
+    // update field
+    this.selected = selected
+
+    // ensure scrolled to selection
+    if (selected != null)
+    {
+      view := viewportLines
+      viewNum := view.end - view.start
+      if (selected < view.start)
+      {
+        scrollToLine(selected)
+      }
+      if (selected >= view.end)
+      {
+        scrollToLine(selected - viewNum + 1)
+      }
+    }
+
+    // repaint and fire callback
+    repaint
+    fireSelect
+  }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Fields
@@ -267,6 +318,6 @@ class ItemList : Panel
 
   private Int accY
   private Int spaceW
-  private Int selected := -1
+  private Int? selected
 }
 

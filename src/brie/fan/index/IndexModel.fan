@@ -22,6 +22,8 @@ const class PodInfo
     types.each |t| { t.podRef.val = this }
   }
 
+  TypeInfo? type(Str name) { types.find |t| { t.name == name } }
+
   const Str name
   override Str toStr() { name }
   const File? podFile

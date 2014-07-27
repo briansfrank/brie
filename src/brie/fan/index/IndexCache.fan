@@ -35,6 +35,7 @@ internal class IndexCache
   {
     cur := pods[name] ?: PodInfo(name, null, TypeInfo[,], null, File#.emptyList)
     pods[name] = PodInfo(name, cur.podFile, cur.types, srcDir, srcFiles)
+    docs.remove(name)
     return null
   }
 
@@ -42,6 +43,7 @@ internal class IndexCache
   {
     cur := pods[name] ?: PodInfo(name, null, TypeInfo[,], null, File#.emptyList)
     pods[name] = PodInfo(name, podFile, types, cur.srcDir, cur.srcFiles)
+    docs.remove(name)
     return null
   }
 
@@ -64,7 +66,7 @@ internal class IndexCache
 
   private Int matchType(TypeInfo t, Str pattern)
   {
-    if (t.name == pattern) return 2
+    if (t.name == pattern || t.qname == pattern) return 2
     if (t.name.startsWith(pattern)) return 1
     return 0
   }
@@ -94,5 +96,28 @@ internal class IndexCache
     return 0
   }
 
+  DocPod? podDoc(PodInfo p)
+  {
+    doc := docs[p.name]
+    if (doc != null) return doc
+    echo("Load pod doc '$p.name' [$p.podFile]")
+    if (p.podFile == null) return null
+
+    try
+    {
+      doc = DocPod.load(p.podFile)
+    }
+    catch (Err e)
+    {
+      echo("ERROR: Cannot pod doc [$p.podFile]")
+      e.trace
+      return null
+    }
+
+    docs[p.name] = doc
+    return doc
+  }
+
   private Str:PodInfo pods := [:]
+  private Str:DocPod docs := [:]
 }
