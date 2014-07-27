@@ -9,6 +9,8 @@
 using gfx
 using fwt
 using concurrent
+using compilerDoc
+using syntax
 using bocce
 
 **
@@ -44,6 +46,7 @@ const class Commands
   const Cmd find         := FindCmd()
   const Cmd findInSpace  := FindInSpaceCmd()
   const Cmd goto         := GotoCmd()
+  const Cmd showDocs     := ShowDocsCmd()
   const Cmd fileRename   := FileRenameCmd()
   const Cmd fileDup      := FileDupCmd()
   const Cmd fileDelete   := FileDeleteCmd()
@@ -205,36 +208,103 @@ internal const class GotoCmd : Cmd
     if (selected == null) return
     frame.goto(selected)
   }
+}
 
-  private Item[] findMatches(Str text)
+**************************************************************************
+** ShowDocsCmd
+**************************************************************************
+
+internal const class ShowDocsCmd : Cmd
+{
+  override const Str name := "Show Docs"
+  override const Key? key := Key(Keys.showDocs)
+  override Void invoke(Event event)
   {
-    acc := Item[,]
+    finder := ItemFinder(frame) { slotMode = true }
+    docs := Editor { ro = true; rules = SyntaxRules.loadForExt("fan") }
+    docs.load("".in)
 
-    // integers are always line numbers
-    line := text.toInt(10, false)
-    file := frame.curFile
-    if (line != null && file != null)
-      return [Item { it.dis= "Line $line"; it.file = file; it.line = line-1 }]
-
-    /// slots in current type
-    curType := frame.curSpace.curType
-    if (curType != null)
+    // build dialog
+    ok := Dialog.ok
+    cancel := Dialog.cancel
+    dialog := Dialog(frame)
     {
-      curType.slots.each |s|
+      title = "Show Docs"
+      body = ConstraintPane
       {
-        if (s.name.startsWith(text)) acc.add(Item(s) { dis = s.name })
+        minw = 900; minh = 300
+        EdgePane
+        {
+          left = ConstraintPane { minw = maxw = 250; finder, }
+          center = InsetPane(0, 0, 0, 8) { docs, }
+        },
       }
+      commands = [ok]
+      defCommand = null
     }
 
-    // match types
-    if (!text.isEmpty)
-      acc.addAll(sys.index.matchTypes(text).map |t->Item| { Item(t) })
+    // event handling
+    finder.onAction.add |e| { docs.load(format(e.data).in) }
+    finder.onSelect.add |e| { docs.load(format(e.data).in) }
 
-    // f <file>
-    if (text.startsWith("f ") && text.size >= 3)
-      acc.addAll(sys.index.matchFiles(text[2..-1]))
+    dialog.open
+  }
 
-    return acc
+  Str format(Item? item)
+  {
+    if (item == null) return ""
+    if (item.slot != null)
+    {
+      d := frame.sys.index.slotDoc(item.slot)
+      if (d == null) return "Not Available"
+      if (d is DocField) return formatField(d)
+      else return formatMethod(d)
+    }
+    else
+    {
+      d := frame.sys.index.typeDoc(item.type)
+      if (d == null) return "Not Available"
+      return formatType(d)
+    }
+  }
+
+  private StrBuf formatStart(DocFandoc doc, Str flags)
+  {
+    s := StrBuf()
+    s.add("**\n")
+    lines := doc.text.splitLines
+    while (lines.size > 0 && lines[-1].isEmpty) lines.removeAt(-1)
+    lines.each |line| { s.add("** ").add(line).add("\n") }
+    s.add("**\n")
+    if (!flags.isEmpty) s.add(flags).add(" ")
+    return s
+  }
+
+  private Str formatType(DocType t)
+  {
+    s := formatStart(t.doc, DocFlags.toTypeDis(t.flags))
+    s.add(t.qname)
+    return s.toStr
+  }
+
+  private Str formatField(DocField f)
+  {
+    s := formatStart(f.doc, DocFlags.toSlotDis(f.flags))
+    s.add(f.type.dis).add(" ").add(f.name)
+    return s.toStr
+  }
+
+  private Str formatMethod(DocMethod m)
+  {
+    s := formatStart(m.doc, DocFlags.toSlotDis(m.flags))
+    s.add(m.returns.dis).add(" ").add(m.name).add("(")
+    m.params.each |p, i|
+    {
+      if (i > 0) s.add(", ")
+      s.add(p.type.dis).add(" ").add(p.name)
+    }
+    s.add(")")
+    return s.toStr
   }
 }
 

@@ -58,7 +58,7 @@ class Editor : Panel
 //////////////////////////////////////////////////////////////////////////
 
   ** Load from lines already parsed into memory
-  Void loadLines(Str[] lines) { doc.load(lines) }
+  Void loadLines(Str[] lines) { doc.load(lines); relayout; repaint }
 
   ** Load the document from the given input stream
   Void load(InStream in) { loadLines(in.readAllLines) }
