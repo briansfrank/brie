@@ -146,6 +146,11 @@ const class Item
       MenuItem { it.mode = MenuItemMode.sep },
       MenuItem
       {
+        it.text = "Rename"
+        it.onAction.add |e| { cmds.fileRename.runOn(file) }
+      },
+      MenuItem
+      {
         it.text = "Duplicate"
         it.onAction.add |e| { cmds.fileDup.runOn(file) }
         it.enabled = !file.isDir

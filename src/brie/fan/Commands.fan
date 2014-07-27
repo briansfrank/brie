@@ -44,6 +44,7 @@ const class Commands
   const Cmd find         := FindCmd()
   const Cmd findInSpace  := FindInSpaceCmd()
   const Cmd goto         := GotoCmd()
+  const Cmd fileRename   := FileRenameCmd()
   const Cmd fileDup      := FileDupCmd()
   const Cmd fileDelete   := FileDeleteCmd()
   const Cmd build        := BuildCmd()
@@ -354,6 +355,25 @@ internal const class FindInSpaceCmd : Cmd
     if (cs is PodSpace)  dir = ((PodSpace)cs).dir
     if (cs is FileSpace) dir = ((FileSpace)cs).dir
     if (dir != null) ((FindCmd)sys.commands.find).runOn(dir)
+  }
+}
+
+**************************************************************************
+** FileRenameCmd
+**************************************************************************
+
+internal const class FileRenameCmd : Cmd
+{
+  override const Str name := "File Rename"
+  override Void invoke(Event event) { throw Err("Need file") }
+
+  override Void runOn(File f)
+  {
+    prompt := Dialog.openPromptStr(frame, "New file name:", f.name)
+    if (prompt == null) return
+
+    f.rename(prompt)
+    frame.reload
   }
 }
 
