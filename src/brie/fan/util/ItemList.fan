@@ -44,6 +44,7 @@ class ItemList : Panel
 
   const Color auxColor := Color("#666")
 
+  ** Show A - B accelerators and enable keyboard navigation
   Bool showAcc := false
 
   Bool showSpace := false
@@ -116,7 +117,7 @@ class ItemList : Panel
 
   override Void onPaintLines(Graphics g, Range lines)
   {
-    x := 0
+    x := 4
     y := 0
     itemh := this.itemh
     items.eachRange(lines) |item, index|
@@ -133,13 +134,13 @@ class ItemList : Panel
     if (item === this.highlight)
     {
       g.brush = Color.yellow
-      g.fillRect(0, y, w, itemh)
+      g.fillRoundRect(0, y, w, itemh, 10, 10)
     }
     if (index == selected)
     {
       g.brush = Desktop.sysListSelBg
       fg = Desktop.sysListSelFg
-      g.fillRect(0, y, w, itemh)
+      g.fillRoundRect(0, y, w, itemh, 10, 10)
     }
     if (showAcc)
     {
@@ -206,6 +207,19 @@ class ItemList : Panel
 
   private Void doKeyDown(Event event)
   {
+    if (event.key == Key.esc)
+    {
+      dlg := window as Dialog
+      if (dlg != null)
+      {
+        cancel := dlg.commands.find |cmd| { cmd == Dialog.cancel }
+        if (cancel != null) dlg.close(cancel)
+      }
+      return
+    }
+
+    if (!showAcc) return
+
     if (event.key == Key.up && lineCount > 0)
     {
       selected--
@@ -229,17 +243,6 @@ class ItemList : Panel
       return
     }
 
-    if (event.key == Key.esc)
-    {
-      dlg := window as Dialog
-      if (dlg != null)
-      {
-        cancel := dlg.commands.find |cmd| { cmd == Dialog.cancel }
-        if (cancel != null) dlg.close(cancel)
-      }
-      return
-    }
-
     code := event.keyChar
     if (code >= 97 && code <= 122) code -= 32
     code -= 65
@@ -251,7 +254,7 @@ class ItemList : Panel
 
   private Void doFocus(Event e)
   {
-    if (selected < 0 && !items.isEmpty)
+    if (showAcc && selected < 0 && !items.isEmpty)
     {
       selected = 0
       repaint
