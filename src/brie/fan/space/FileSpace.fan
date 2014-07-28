@@ -83,16 +83,32 @@ const class FileSpace : Space
     lister := ItemList(frame, Item.makeFiles(lastDir.list))
 
     // if path is file, make view for it
-    Widget? view := null
+    View? view := null
     if (!x.isDir) view = View.makeBest(frame, x)
 
-    return EdgePane
-    {
-      top = InsetPane(0, 4, 6, 2) { pathBar, }
-      left = InsetPane(0, 4, 0, 4) { lister, }
-      center = InsetPane(0, 4, 0, 0) { view, }
-    }
+    return FileSpacePane(frame, pathBar, lister, view)
+  }
+}
+
+**************************************************************************
+** FileSpacePane
+**************************************************************************
+
+internal class FileSpacePane : SpacePane
+{
+  new make(Frame f, NavBar pathBar, ItemList lister, View? view) : super(f)
+  {
+    this.pathBar = pathBar
+    this.lister = lister
+    this.view = view
+
+    top = InsetPane(0, 4, 6, 2) { pathBar, }
+    left = InsetPane(0, 4, 0, 4) { lister, }
+    center = InsetPane(0, 4, 0, 0) { view, }
   }
 
+  NavBar pathBar
+  ItemList lister
+  override View? view
 }
 

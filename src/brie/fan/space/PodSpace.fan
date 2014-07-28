@@ -33,7 +33,6 @@ const class PodSpace : Space
   ** Active file
   const File file
 
-
   override Str dis() { name }
 
   override Image icon() { Theme.iconPod }
@@ -81,18 +80,20 @@ const class PodSpace : Space
 
   override Widget onLoad(Frame frame)
   {
-    return EdgePane
-    {
-      left = EdgePane
-      {
-        left = InsetPane(0, 5, 0, 5) { makeFileNav(frame), }
-        right = InsetPane(0, 5, 0, 0) { makeSlotNav(frame), }
-      }
-      center = InsetPane(0, 5, 0, 0) { View.makeBest(frame, file), }
-    }
+    fileNav := makeFileNav(frame)
+    slotNav := makeSlotNav(frame)
+    view    := View.makeBest(frame, file)
+    pane    := PodSpacePane(frame, fileNav, slotNav, view)
+
+    // maintain scroll position
+    oldPane := frame.spacePane as PodSpacePane
+    if (oldPane != null)
+      fileNav.scrollToLine(oldPane.fileNav.viewportLines.min)
+
+    return pane
   }
 
-  private Widget makeFileNav(Frame frame)
+  private ItemList makeFileNav(Frame frame)
   {
     // get all the files
     files := File[,]
@@ -125,7 +126,7 @@ const class PodSpace : Space
     return ItemList(frame, items)
   }
 
-  private Widget? makeSlotNav(Frame frame)
+  private ItemList? makeSlotNav(Frame frame)
   {
     if (file.ext != "fan") return null
 
@@ -151,3 +152,27 @@ const class PodSpace : Space
   }
 }
 
+**************************************************************************
+** PodSpacePane
+**************************************************************************
+
+internal class PodSpacePane : SpacePane
+{
+  new make(Frame f, ItemList fileNav, ItemList? slotNav, View view) : super(f)
+  {
+    this.fileNav = fileNav
+    this.slotNav = slotNav
+    this.view = view
+
+    this.left = EdgePane
+    {
+      it.left = InsetPane(0, 5, 0, 5) { fileNav, }
+      it.right = InsetPane(0, 5, 0, 0) { slotNav, }
+    }
+    this.center = InsetPane(0, 5, 0, 0) { view, }
+  }
+
+  ItemList fileNav
+  ItemList? slotNav
+  override View? view
+}
