@@ -65,7 +65,17 @@ const class HomeSpace : Space
       expandRow = 0
     }
     podGroups.each |g| { grid.add(g) }
-    return InsetPane(0, 5, 5, 5) { grid, }
+    content := InsetPane(0, 5, 5, 5) { grid, }
+    return HomeSpacePane(frame, content)
   }
+}
+
+**************************************************************************
+** HomeSpacePane
+**************************************************************************
+
+internal class HomeSpacePane : SpacePane
+{
+  new make(Frame f, Widget c) : super(f)  { center = c }
 }
 

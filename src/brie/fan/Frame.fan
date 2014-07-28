@@ -36,7 +36,8 @@ class Frame : Window
 
     // build UI
     this.spaceBar = SpaceBar(this)
-    this.spacePane = ContentPane()
+    this.spacePane = SpacePane(this)
+    this.spaceContent = ContentPane { spacePane, }
     this.statusBar = StatusBar(this)
     this.console   = Console(this)
     this.content = EdgePane
@@ -46,7 +47,7 @@ class Frame : Window
       {
         orientation = Orientation.vertical
         weights = [70, 30]
-        spacePane,
+        spaceContent,
         console,
       }
       it.bottom = statusBar
@@ -74,7 +75,10 @@ class Frame : Window
   ** Current space pod
   PodInfo? curPod() { curSpace.curPod }
 
-  ** If current space has loaded a view
+  ** Space widget
+  SpacePane spacePane { private set }
+
+  ** If current space has loaded a view 'spacePane.view'
   View? curView { private set }
 
   ** Currently open spaces
@@ -198,10 +202,9 @@ class Frame : Window
 
     // load space
     spaceBar.onLoad
-    spacePane.content = space.onLoad(this)
-
-    // see if current space content has view
-    this.curView = findView(spacePane.content)
+    this.spacePane = space.onLoad(this)
+    this.curView = spacePane.view
+    spaceContent.content = spacePane
     updateStatus
 
     // save curItem and push into history
@@ -209,7 +212,7 @@ class Frame : Window
 
     // relayout
     spaceBar.relayout
-    spacePane.relayout
+    spaceContent.relayout
     relayout
 
     // now check if we have view to handle line/col
@@ -222,12 +225,6 @@ class Frame : Window
       }
       if (item != null) curView.onGoto(item)
     }
-  }
-
-  private static View? findView(Widget w)
-  {
-    if (w is View) return w
-    return w.children.eachWhile |kid| { findView(kid) }
   }
 
   private Int spaceIndex(Space space)
@@ -392,7 +389,7 @@ class Frame : Window
 
   private File sessionFile := Env.cur.workDir + `etc/brie/session.props`
   private SpaceBar spaceBar
-  private ContentPane spacePane
+  private ContentPane spaceContent
   private StatusBar statusBar
   private File:Pos filePosHis := [:]
 }
