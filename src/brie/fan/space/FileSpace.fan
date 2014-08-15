@@ -15,7 +15,7 @@ using fwt
 @Serializable
 const class FileSpace : Space
 {
-  new make(Sys sys, File dir, Str dis:= FileUtil.pathDis(dir), Uri path := ``)
+  new make(Sys sys, File dir, Str dis:= dir.name, Uri path := ``)
     : super(sys)
   {
     if (!dir.exists) throw Err("Dir doesn't exist: $dir")
