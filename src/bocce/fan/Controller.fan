@@ -435,7 +435,11 @@ class Controller
   {
     caretVisible = !caretVisible
     viewport.repaintLine(viewport.caret.line)
-    if (editor.hasFocus) Desktop.callLater(500ms) |->| { onAnimate }
+    if (editor.hasFocus && !animateScheduled)
+    {
+      animateScheduled = true
+      Desktop.callLater(500ms) |->| { animateScheduled = false; onAnimate }
+    }
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -447,7 +451,8 @@ class Controller
   private Bool isMouseDown     // is mouse currently down
   private Int? navCol          // to handle ragged col up/down
 
-  ChangeStack changeStack  // change stack
-  Bool caretVisible    // is caret visible or blinking off
+  ChangeStack changeStack   // change stack
+  Bool caretVisible         // is caret visible or blinking off
+  Bool animateScheduled     // do we have an animate callLater scheduled
 }
 
