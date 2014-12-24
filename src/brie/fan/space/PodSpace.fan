@@ -97,7 +97,7 @@ const class PodSpace : Space
   {
     // get all the files
     files := File[,]
-    dir.walk |f| { if (!f.isDir) files.add(f) }
+    dir.walk |f| { if (!f.isDir && FileUtil.show(f)) files.add(f) }
 
     // organize by dir
     byDir := File:File[][:]

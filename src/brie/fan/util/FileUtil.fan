@@ -13,6 +13,12 @@ using concurrent
 **
 internal const class FileUtil
 {
+  static Bool show(File file)
+  {
+    if (file.name == ".DS_Store") return false
+    return true
+  }
+
   static Str pathDis(File file)
   {
     names := file.path.dup

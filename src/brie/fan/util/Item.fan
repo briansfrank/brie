@@ -28,6 +28,7 @@ const class Item
   static Item[] makeFiles(File[] files)
   {
     acc := Item[,]
+    files = files.findAll |f| { FileUtil.show(f) }
     files.sort |a,b| { a.name <=> b.name }
     files.each |f| { if (f.isDir) acc.add(makeFile(f)) }
     files.each |f| { if (!f.isDir) acc.add(makeFile(f)) }
