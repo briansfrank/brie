@@ -153,7 +153,7 @@ const class Index
     if (id === "addPodSrc")   return c.addPodSrc(msg.a, msg.b, msg.c)
     if (id === "addPodLib")   return c.addPodLib(msg.a, msg.b, msg.c)
     if (id === "podDoc")      return c.podDoc(msg.a)
-    if (id === "clearAll")    return Actor.locals["cache"] = IndexCache(this)
+    if (id === "clearAll")    return Unsafe(Actor.locals["cache"] = IndexCache(this))
 
     echo("ERROR: Unknown msg: $msg.id")
     throw Err("Unknown msg: $msg.id")
