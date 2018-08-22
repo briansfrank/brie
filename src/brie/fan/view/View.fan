@@ -20,6 +20,7 @@ abstract class View : ContentPane
     if (file.isDir) return DirView(frame, file)
     mime := file.mimeType ?: MimeType("text/plain")
     if (mime.mediaType == "text") return TextView(frame, file)
+    if (file.ext?.lower == "svg") return TextView(frame, file)
     if (mime.mediaType == "image") return ImageView(frame, file)
     return null
   }

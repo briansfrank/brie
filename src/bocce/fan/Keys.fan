@@ -27,8 +27,8 @@ class Keys
   const static Str nextWord      := mac ? "Alt+Right"     : "Ctrl+Right"
   const static Str lineStart     := mac ? "Command+Left"  : "Home"
   const static Str lineEnd       := mac ? "Command+Right" : "End"
-  const static Str docStart      := mac ? "Command+Up"    : "Ctrl+Home"
-  const static Str docEnd        := mac ? "Command+Down"  : "Ctrl+End"
+  const static Str docStart      := mac ? "Alt+Command+Up"    : "Ctrl+Home"
+  const static Str docEnd        := mac ? "Alt+Command+Down"  : "Ctrl+End"
   const static Str pageUp        := "PageUp"
   const static Str pageDown      := "PageDown"
 
