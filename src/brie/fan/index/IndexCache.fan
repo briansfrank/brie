@@ -105,7 +105,7 @@ internal class IndexCache
 
     try
     {
-      doc = DocPod.load(p.podFile)
+      doc = DocPod.load(null, p.podFile)
     }
     catch (Err e)
     {
