@@ -36,6 +36,7 @@ const class Commands
 
   const Sys sys
   const Cmd[] list
+  const Cmd about        := AboutCmd()
   const Cmd exit         := ExitCmd()
   const Cmd reload       := ReloadCmd()
   const Cmd save         := SaveCmd()
@@ -73,6 +74,37 @@ const abstract class Cmd
   Options options() { sys.options }
   Frame frame() { sys.frame }
   Console console() { frame.console }
+}
+
+**************************************************************************
+** AboutCmd
+**************************************************************************
+
+internal const class AboutCmd : Cmd
+{
+  override const Str name := "About"
+  override const Key? key := Key(Keys.about)
+  override Void invoke(Event event)
+  {
+    s := StrBuf()
+    env := Env.cur
+    vars := env.vars
+    javaVer := env.javaVersion
+    fanVer := Pod.find("sys").version.toStr
+    s.add("java.version:    ").add(vars["java.version"]).add("\n")
+    s.add("java.vm.name:    ").add(vars["java.vm.name"]).add("\n")
+    s.add("java.vm.vendor:  ").add(vars["java.vm.vendor"]).add("\n")
+    s.add("java.home:       ").add(vars["java.home"]).add("\n")
+    s.add("fan.platform:    ").add(env.platform).add("\n")
+    s.add("fan.version:     ").add(fanVer).add("\n")
+    s.add("fan.env:         ").add(env).add("\n")
+    s.add("fan.home:        ").add(env.homeDir.osPath).add("\n")
+    s.add("fan.work:        ").add(env.workDir.osPath).add("\n")
+
+    msg := "Brian's Rocking Integrated Environment | Java $javaVer | Fantom $fanVer"
+
+    Dialog.openInfo(frame, msg, s.toStr)
+  }
 }
 
 **************************************************************************
