@@ -52,6 +52,7 @@ class Keys
 
   const static Str toggleComment := mac ? "Command+Slash" : "Ctrl+Slash"
   const static Str insertSection := mac ? "Command+=" : "Ctrl+="
+  const static Str about         := mac ? "Command+A" : "Ctrl+A"
   const static Str save          := mac ? "Command+S" : "Ctrl+S"
   const static Str reload        := mac ? "Command+R" : "Ctrl+R"
   const static Str find          := mac ? "Command+F" : "Ctrl+F"
