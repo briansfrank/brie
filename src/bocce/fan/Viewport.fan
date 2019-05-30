@@ -239,6 +239,7 @@ class Viewport
         g.fillRect(linex  + brackets.end.col*colw, liney, colw, lineh)
     }
 
+
     // styled text (actual line content)
     linex0   := linex
     line     := doc.line(linei)
@@ -249,15 +250,14 @@ class Viewport
       style := (RichTextStyle)styling[i+1]
       end   := styling.getSafe(i+2) as Int ?: line.size
       text  := line[start..<end]
-      textw := g.font.width(text)
+      textw := text.size * colw
       if (style.bg != null)
       {
-          g.brush = style.bg
-          g.fillRect(linex, liney, textw, lineh)
+        g.brush = style.bg
+        g.fillRect(linex, liney, textw, lineh)
       }
       g.brush = style.fg
-      g.drawText(text, linex, liney)
-
+      drawText(g, text, linex, liney)
       linex += textw
     }
 
@@ -274,7 +274,7 @@ class Viewport
       g.brush = options.selectBg
       g.fillRect(textx, liney, textw, lineh)
       g.brush = options.selectFg
-      g.drawText(text, textx, liney)
+      drawText(g, text, textx, liney)
     }
 
     // caret for line
@@ -283,6 +283,19 @@ class Viewport
       caretx := linex0 + (caretCol * colw)
       g.brush = Color.black
       g.drawLine(caretx, liney, caretx, liney+lineh)
+    }
+  }
+
+  private Void drawText(Graphics g, Str text, Int x, Int y)
+  {
+    g.drawText(text, x, y)
+    return
+
+    // draw each char to force true monospace (Java 8 SWT isn't working right)
+    for (c := 0; c<text.size; ++c)
+    {
+      g.drawText(text[c].toChar, x, y)
+      x += colw
     }
   }
 

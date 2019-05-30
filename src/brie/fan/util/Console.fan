@@ -122,6 +122,7 @@ internal const class ConsoleProcess
 {
   new make(Console console)
   {
+    this.sys = console.sys
     Actor.locals["console"] = console
     actor = Actor(ActorPool()) |msg| { receive(msg) }
   }
@@ -219,9 +220,13 @@ internal const class ConsoleProcess
   {
     try
     {
+      // create Process
       proc := Process(cmd, dir)
       procRef.val = Unsafe(proc)
       proc.out = ConsoleOutStream(this)
+      proc.env["JAVA_HOME"] = sys.jdkHome
+
+      // run it
       proc.run.join
     }
     catch (Err e)
@@ -235,6 +240,7 @@ internal const class ConsoleProcess
     return null
   }
 
+  private const Sys sys
   private const Actor actor
   private const AtomicRef procRef := AtomicRef(null)
 }

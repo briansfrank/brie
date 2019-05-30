@@ -95,11 +95,14 @@ internal const class AboutCmd : Cmd
     s.add("java.vm.name:    ").add(vars["java.vm.name"]).add("\n")
     s.add("java.vm.vendor:  ").add(vars["java.vm.vendor"]).add("\n")
     s.add("java.home:       ").add(vars["java.home"]).add("\n")
+    s.add("jdk.home         ").add(sys.jdkHome).add("\n")
     s.add("fan.platform:    ").add(env.platform).add("\n")
     s.add("fan.version:     ").add(fanVer).add("\n")
     s.add("fan.env:         ").add(env).add("\n")
     s.add("fan.home:        ").add(env.homeDir.osPath).add("\n")
     s.add("fan.work:        ").add(env.workDir.osPath).add("\n")
+    s.add("brie.version:    ").add(typeof.pod.version).add("\n")
+    s.add("brie.ts:         ").add(DateTime(typeof.pod.meta["build.ts"]).toLocale).add("\n")
 
     msg := "Brian's Rocking Integrated Environment | Java $javaVer | Fantom $fanVer"
 
