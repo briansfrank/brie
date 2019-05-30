@@ -44,7 +44,7 @@ const class EditorOptions
 //////////////////////////////////////////////////////////////////////////
 
   const Color bg                    := Color.white
-  const Font font                   := Desktop.sysFontMonospace
+  const Font font                   := Font("12pt Monaco")
   const Color bgCurLine             := Color(0xee_ee_ee) // Color(0xE6FFDA)
   const Color highlight             := Color(0xff_ff_66)
   const Color div                   := Color(0xdd_dd_dd)
