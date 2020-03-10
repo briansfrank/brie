@@ -1,6 +1,10 @@
 Change Log for Brie
 ====================
 
+Version 1.0.1 (23-May-2019)
+---------------------------
+- Add about command
+
 Version 1.0.1 (10-May-2012)
 -----------------------
 - Coding started on 21-Apr-2012
